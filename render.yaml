@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: skincare-ai
+    env: python
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput"
+    startCommand: "gunicorn skincare_ai.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.0
+      - key: DJANGO_SETTINGS_MODULE
+        value: skincare_ai.settings
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
+      - key: DISABLE_COLLECTSTATIC
+        value: 1
+    plan: free
+    numInstances: 1
+    disk:
+      name: skincare_data
+      mountPath: /opt/render/project/src/media
+      sizeGB: 1
