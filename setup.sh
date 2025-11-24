@@ -1,33 +1,40 @@
 #!/bin/bash
 
-echo "🧴 SkinCare AI Setup Script"
-echo "=========================="
+# Exit on error
+set -o errexit
 
-# Check if Python is installed
-if ! command -v python &> /dev/null; then
-    echo "❌ Python is not installed. Please install Python 3.8+ first."
-    exit 1
-fi
+echo "🧴 SkinCare AI - Render Deployment Setup"
+echo "===================================="
 
-echo "✅ Python found: $(python --version)"
+# Set Python version
+PYTHON_VERSION=${PYTHON_VERSION:-3.9.0}
 
-# Create virtual environment if it doesn't exist
-if [ ! -d "venv" ]; then
-    echo "📦 Creating virtual environment..."
-    python -m venv venv
-fi
-
-# Activate virtual environment
-echo "🔧 Activating virtual environment..."
-source venv/bin/activate
+echo "🐍 Using Python version: $PYTHON_VERSION"
 
 # Install Python dependencies
-echo "📚 Installing Python dependencies..."
-echo "🔼 Upgrading pip, setuptools and wheel to avoid build issues (Pillow/build deps)..."
-python -m pip install --upgrade pip setuptools wheel
-python -m pip install -r requirements.txt
+echo "📦 Installing Python dependencies..."
+pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt
 
-# Setup Django
+# Make scripts executable
+echo "🔧 Making scripts executable..."
+chmod +x start.sh
+
+# Create necessary directories
+echo "📂 Creating necessary directories..."
+mkdir -p staticfiles
+mkdir -p media
+
+# Set proper permissions
+echo "🔒 Setting permissions..."
+chmod -R 755 .
+
+# Verify Django settings
+echo "🔍 Verifying Django settings..."
+python manage.py check --deploy
+
+echo "✅ Setup completed successfully!"
+echo "🚀 Start the application with: ./start.sh"
 echo "⚙️ Setting up Django..."
 python manage.py migrate
 
